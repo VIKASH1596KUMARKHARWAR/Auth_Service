@@ -16,9 +16,33 @@ const create = async (req, res) => {
       error: {},
     });
   } catch (error) {
-    console.log("Something went on the controller layer");
+    console.log("Something went wrong in the controller layer", error);
     return res.status(500).json({
-      message: "Somethign went wrong",
+      message: "Something went wrong",
+      data: {},
+      success: false,
+      err: error,
+    });
+  }
+};
+
+const signIn = async (req, res) => {
+  try {
+    const response = await userService.signIn(
+      req.body.email,
+      req.body.password
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Successfully signed in",
+      data: response, // likely a JWT token + user details
+      error: {},
+    });
+  } catch (error) {
+    console.log("Something went wrong in the controller layer", error);
+    return res.status(500).json({
+      message: "Something went wrong",
       data: {},
       success: false,
       err: error,
@@ -28,4 +52,5 @@ const create = async (req, res) => {
 
 module.exports = {
   create,
+  signIn,
 };
