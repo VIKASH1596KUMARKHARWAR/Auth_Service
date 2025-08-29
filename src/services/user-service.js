@@ -6,12 +6,12 @@ const UserRepository = require("../repository/user-repository");
 
 class UserService {
   constructor() {
-    this.UserRepository = new UserRepository();
+    this.userRepository = new UserRepository();
   }
 
   async create(data) {
     try {
-      const user = await this.UserRepository.create(data);
+      const user = await this.userRepository.create(data);
       return user;
     } catch (error) {
       console.log("Something went wrong in service ;layer");
@@ -22,7 +22,7 @@ class UserService {
   async signIn(email, plainPassword) {
     try {
       //step:1-> fetch the user using the email
-      const user = await this.UserRepository.getUserByEmail(email);
+      const user = await this.userRepository.getUserByEmail(email);
 
       //step2 :-> compare incomming password with the stores encrypted password
       const passwordMatch = this.checkPassword(plainPassword, user.password);
@@ -35,6 +35,24 @@ class UserService {
       //step3-> if password match then create a token and send it to the user
       const newJWT = this.createToken({ email: user.email, id: user.id });
       return newJWT;
+    } catch (error) {
+      console.log("Something went wrong in the signIn process");
+      throw { error };
+    }
+  }
+
+  async isAuthenticated(token) {
+    try {
+      const response = this.verifyToken(token);
+      if (!response) {
+        throw { error: "Invalid token" };
+      }
+
+      const user = this.userRepository.getById(response.id);
+      if (!user) {
+        throw { error: "No user with the corresponding token exist" };
+      }
+      return user.id;
     } catch (error) {
       console.log("Something went wrong in the signIn process");
       throw { error };

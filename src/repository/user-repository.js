@@ -34,8 +34,8 @@ class UserRepository {
       });
       return user;
     } catch (error) {
-      console.log("Something went wrong on repository layer");
-      throw { error };
+      console.error("Something went wrong on repository layer:", error);
+      throw new Error(error.message || "Failed to fetch user by ID");
     }
   }
 
