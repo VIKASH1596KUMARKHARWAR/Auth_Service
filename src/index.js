@@ -14,7 +14,7 @@ const prepareAndStartServer = () => {
 
   app.use("/api", apiRoutes);
 
-  app.listen(PORT, () => {
+  app.listen(PORT, async () => {
     console.log(`Server started at: ${PORT}`);
 
     if (process.env.DB_SYNC) {
