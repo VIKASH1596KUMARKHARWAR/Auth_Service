@@ -3,19 +3,36 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const UserRepository = require("../repository/user-repository");
+const AppErrors = require("../utils/error-handler");
+const ValidationError = require("../utils/validation-error");
 
 class UserService {
   constructor() {
     this.userRepository = new UserRepository();
   }
-
   async create(data) {
     try {
       const user = await this.userRepository.create(data);
       return user;
     } catch (error) {
-      console.log("Something went wrong in service ;layer");
-      throw { error };
+      console.log("Service layer", error);
+
+      // ✅ Use instanceof or error.name
+      if (
+        error instanceof ValidationError ||
+        error.name === "ValidationError"
+      ) {
+        throw error;
+      }
+
+      console.log("Something went wrong in service layer");
+      throw error;
+      // throw new AppErrors(
+      //   "ServerError",
+      //   "something went wrong in service",
+      //   "Logical issue found",
+      //   StatusCodes.INTERNAL_SERVER_ERROR
+      // );
     }
   }
 

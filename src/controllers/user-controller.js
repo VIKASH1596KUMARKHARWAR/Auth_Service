@@ -17,11 +17,12 @@ const create = async (req, res) => {
     });
   } catch (error) {
     console.log("Something went wrong in the controller layer", error);
-    return res.status(500).json({
-      message: "Something went wrong",
+
+    return res.status(error.statusCode).json({
+      message: error.message || "Validation failed",
       data: {},
       success: false,
-      err: error,
+      err: error.explanation || [],
     });
   }
 };
