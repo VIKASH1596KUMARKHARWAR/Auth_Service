@@ -3,8 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const UserRepository = require("../repository/user-repository");
-const AppErrors = require("../utils/error-handler");
-const ValidationError = require("../utils/validation-error");
+const AppErrors = require("../utils/errors/error-handler");
+const ValidationError = require("../utils/errors/validation-error");
 
 class UserService {
   constructor() {
@@ -17,7 +17,6 @@ class UserService {
     } catch (error) {
       console.log("Service layer", error);
 
-      // ✅ Use instanceof or error.name
       if (
         error instanceof ValidationError ||
         error.name === "ValidationError"
@@ -53,8 +52,11 @@ class UserService {
       const newJWT = this.createToken({ email: user.email, id: user.id });
       return newJWT;
     } catch (error) {
+      if (error.name == "AttributeNotFound") {
+        throw error;
+      }
       console.log("Something went wrong in the signIn process");
-      throw { error };
+      throw error;
     }
   }
 

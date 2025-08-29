@@ -1,6 +1,8 @@
+const { StatusCodes } = require("http-status-codes");
 const { User, Role } = require("../models/index");
-const AppErrors = require("../utils/error-handler");
-const ValidationError = require("../utils/validation-error");
+const ClientError = require("../utils/errors/client-error");
+const AppErrors = require("../utils/errors/error-handler");
+const ValidationError = require("../utils/errors/validation-error");
 
 class UserRepository {
   async create(data) {
@@ -49,17 +51,49 @@ class UserRepository {
     }
   }
 
+  // async getUserByEmail(userEmail) {
+  //   try {
+  //     const user = await User.findOne({
+  //       where: {
+  //         email: userEmail,
+  //       },
+  //     });
+  //     console.log(user);
+  //     if (!user) {
+  //       throw new ClientError(
+  //         "AttributeNotFound",
+  //         "Invalid email sent in the request",
+  //         "Please check the email as their is no recored of this email",
+  //         StatusCodes.NOT_FOUND
+  //       );
+  //     }
+  //     return user;
+  //   } catch (error) {
+  //     console.log(error);
+
+  //     console.log("Something went wrong on repository layer");
+  //     throw { error };
+  //   }
+  // }
   async getUserByEmail(userEmail) {
     try {
       const user = await User.findOne({
-        where: {
-          email: userEmail,
-        },
+        where: { email: userEmail },
       });
+
+      if (!user) {
+        throw new ClientError(
+          "AttributeNotFound",
+          "Invalid email sent in the request",
+          "Please check the email as there is no record of this email",
+          StatusCodes.NOT_FOUND
+        );
+      }
+
       return user;
     } catch (error) {
-      console.log("Something went wrong on repository layer");
-      throw { error };
+      console.error("Error in getUserByEmail:", error);
+      throw error; // preserve original error for upper layer
     }
   }
 
